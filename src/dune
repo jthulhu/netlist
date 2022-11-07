@@ -1,0 +1,52 @@
+(executable
+ (name graph_test)
+ ; (public_name graph_test)
+ (modules graph_test)
+ (libraries graph)
+ (promote
+  (until-clean)
+  (into "../out")))
+
+(executable
+ (name scheduler_test)
+ (modules scheduler_test)
+ (libraries scheduler netlist netlist_printer unix)
+ (promote
+  (until-clean)
+  (into "../out")))
+
+(executable
+ (name netlist_simulator)
+ (modules netlist_simulator)
+ (libraries netlist netlist_ast scheduler)
+ (promote
+  (until-clean)
+  (into "../out")))
+
+(library
+ (name scheduler)
+ (modules scheduler)
+ (libraries graph netlist_ast))
+
+(library
+ (name netlist)
+ (modules netlist netlist_lexer netlist_parser)
+ (libraries netlist_ast netlist_printer))
+
+(library
+ (name netlist_printer)
+ (modules netlist_printer)
+ (libraries netlist_ast))
+
+(library
+ (name netlist_ast)
+ (modules netlist_ast))
+
+(library
+ (name graph)
+ (modules graph))
+
+(menhir
+ (modules netlist_parser))
+
+(ocamllex netlist_lexer)
