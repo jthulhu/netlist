@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+shopt -s nullglob
+
+WHITE='\e[1;37m'
+GREEN='\e[1;32m'
+RED='\e[1;31m'
+NC='\e[0m'
+
+for circuit in tests/*/*.net; do
+    echo -e "Testing ${WHITE}$(basename -s .net $circuit)${NC}."
+    for unittest in ${circuit%.net}*.in; do
+	if cmp \
+	     <(out/netlist_simulator --batch -n 10 $circuit <$unittest) \
+	     ${unittest%.in}.out 2>/dev/null; then
+	    echo -e " -${GREEN} $(basename -s .in $unittest) succeeded${NC}"
+	else
+	    echo -e " -${RED} $(basename -s .in $unittest) failed${NC}" 1>&2
+	fi
+    done
+done
