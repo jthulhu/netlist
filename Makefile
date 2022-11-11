@@ -10,6 +10,12 @@ out/%.exe: src/
 
 out/%: out/%.exe
 	@cp $< $@
+
+out/%.pdf out/%.aux out/%.log &: docs/%.tex
+	lualatex -output-directory=out $<
+
+doc: out/netlist.pdf
+
 clean:
 	dune clean
 	$(RM) out/*
@@ -17,4 +23,4 @@ clean:
 tests:
 	./run-tests
 
-.PHONY: all clean install build $(patsubst %,out/%.exe,$TARGETS) tests
+.PHONY: all clean install build $(patsubst %,out/%.exe,$TARGETS) tests doc
