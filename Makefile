@@ -2,8 +2,7 @@ TARGETS = netlist_simulator scheduler_test graph_tes
 
 all: out/netlist_simulator
 
-build: src
-	dune build
+build: out/netlist_simulator out/graph_test out/scheduler_test
 
 out/%.exe: src/
 	dune build $(patsubst out/%.exe,src/%.exe,$@)
