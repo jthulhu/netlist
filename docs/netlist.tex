@@ -1,0 +1,53 @@
+\documentclass{scrartcl}
+
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+
+\title{Simulateur de Netlist}
+\author{Adrien \textsc{Mathieu}}
+\date{mercredi 16 novembre}
+
+\begin{document}
+\maketitle
+
+Le simulateur s'attend à recevoir, en argument, le nombre de cycles simulés,
+ainsi que le circuit à simuler. Si le fichier s'appelle \verb|circuit.net|, et il
+contient une variable \verb|var| qui est une rom, le simulateur lit le contenu de
+la rom dans un fichier appelé \verb|circuit.var.rom|. Le contenu de ce fichier
+doit contenir exactement le contenu de la rom, excepté pour l'espacement qui est
+ignoré.\par
+Pour une question de déterminisme (cf. les tests), l'initialisation de la ram et
+des registres se fait à la valeur $0$. Toutes les variables en entrée du circuit
+sont demandées sur l'entrée standard. Par défaut, le nom de la variable, et sa
+taille, sont spécifiée. Cela peut être désactivé avec l'option \verb|--batch|,
+ce qui est utile pour les tests. Les variables de sortie du circuit sont
+affichées, précédées de leur nom, et éventuellement entre chevrons si la variable
+est un bus.\par
+Deux environnements sont maintenus à tout instant: celui des variables définies
+au cycle précédent (dit \verb|old|), et celui des variables définies au cycle
+actuel (dit \verb|current|). À la fin d'un cycle, les deux environnements sont
+inversés. Les variables utilisées comme argument \verb|we|, \verb|wa| et
+\verb|data| sont lues dans l'environnement \verb|old|, ce qui assure que
+l'instruction ram n'induit pas de cycles topologiques pour ces arguments. De
+même, les variables lues dans les registres sont lues dans l'environnement
+\verb|old|. L'écriture des variables, et les autres lectures, sont effectuées
+dans l'environnement \verb|current|.\par
+À noter, ce fonctionnement correspond à la spécification de l'ordre de lecture
+et d'écriture pour la ram, mais introduit un décalage d'un cycle supplémentaire
+par rapport à que l'on pourrait intuitivement penser dans l'écriture.\par
+Le code peut être testé avec \verb|make tests|. Il sera, entre autre, testé sur
+les circuits fournis, et sur d'autres. Pour chacun, si le circuit prend a des
+variables en entrée, plusieurs tests unitaires sont fournis, testant de façon
+(plus ou moins) exhaustive les entrées possibles. Enfin, des tests reposant sur
+des fonctionnalités qui ne sont pas dans la spécification sont fournis. Ils
+mettent en évidence le comportement contre intuitif de l'implémentation de la
+ram.\par
+Le binaire peut être produit avec \verb|make|. Il sera alors en
+\verb|out/netlist_simulator|. La documentation (que vous être en train de lire)
+peut être produite avec \verb|make doc|. Une archive du projet peut être produite
+avec \verb|make archive|. Les binaires intermédiaires du projet peuvent être
+produit avec \verb|make build| (ce qui produit \verb|out/netlist_simulator|,
+\verb|out/graph_test| et \verb|out/scheduler_test|).
+\end{document}
