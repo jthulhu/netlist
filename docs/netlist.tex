@@ -5,6 +5,7 @@
 \usepackage{lmodern}
 \usepackage[french]{babel}
 \usepackage{hyperref}
+\usepackage[normalem]{ulem}
 
 \title{Simulateur de Netlist}
 \author{Adrien \textsc{Mathieu}}
@@ -35,16 +36,18 @@ l'instruction ram n'induit pas de cycles topologiques pour ces arguments. De
 même, les variables lues dans les registres sont lues dans l'environnement
 \verb|old|. L'écriture des variables, et les autres lectures, sont effectuées
 dans l'environnement \verb|current|.\par
-À noter, ce fonctionnement correspond à la spécification de l'ordre de lecture
+\sout{À noter, ce fonctionnement correspond à la spécification de l'ordre de lecture
 et d'écriture pour la ram, mais introduit un décalage d'un cycle supplémentaire
-par rapport à que l'on pourrait intuitivement penser dans l'écriture.\par
+par rapport à que l'on pourrait intuitivement penser dans l'écriture}. Après un
+vigoureux débat avec mes camarades, il a été établi que ``l'unique ordre acceptable
+pour l'écriture dans la RAM'' n'était pas celui qui j'avais. J'ai donc changé
+le comportement de mon simulateur, qui est désormais plus intuitif (tout en
+respectant toujours la spécification).\par
 Le code peut être testé avec \verb|make tests|. Il sera, entre autre, testé sur
 les circuits fournis, et sur d'autres. Pour chacun, si le circuit prend a des
 variables en entrée, plusieurs tests unitaires sont fournis, testant de façon
 (plus ou moins) exhaustive les entrées possibles. Enfin, des tests reposant sur
-des fonctionnalités qui ne sont pas dans la spécification sont fournis. Ils
-mettent en évidence le comportement contre intuitif de l'implémentation de la
-ram.\par
+des fonctionnalités qui ne sont pas dans la spécification sont fournis.\par
 Le binaire peut être produit avec \verb|make|. Il sera alors en
 \verb|out/netlist_simulator|. La documentation (que vous être en train de lire)
 peut être produite avec \verb|make doc|. Une archive du projet peut être produite
