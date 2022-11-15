@@ -1,6 +1,6 @@
 TARGETS = netlist_simulator scheduler_test graph_tes
-SOURCES = src/ docs/ Makefile dune-project flake.nix run-tests
-USEFUL_ARTIFACTS = flake.lock
+SOURCES = src/ docs/ tests/ Makefile dune-project flake.nix run-tests
+USEFUL_ARTIFACTS = flake.lock .envrc
 
 out/%.exe: src/
 	@mkdir -p out
@@ -25,7 +25,7 @@ clean:
 	dune clean
 	$(RM) out/*
 
-tests:
+tests: out/netlist_simulator
 	./run-tests
 
 all: out/netlist_simulator
