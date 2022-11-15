@@ -85,8 +85,8 @@ let simulator program number_steps =
     Hashtbl.replace env key value in
   let get key =
     Hashtbl.find env key in
-  let get_old key =
-    Hashtbl.find registers key in
+  (* let get_old key = *)
+  (*   Hashtbl.find registers key in *)
   let get_bool = function
     | VBit b -> b
     | VBitArray _ -> failwith "Array à la place d'un booléen." in
@@ -108,7 +108,7 @@ let simulator program number_steps =
         res := !res + (1 lsl i)
     done;
     !res in
-  let eval_expr key = function
+  let eval_expr writes key = function
     | Arg arg -> eval_arg arg
     | Reg ident -> Hashtbl.find registers ident
     | Not arg ->
@@ -128,9 +128,10 @@ let simulator program number_steps =
       (if c then b else a) |> eval_arg
     | Ram (_, _, read_addr, write_enable, write_addr, data) ->
       let result = Array.copy (Hashtbl.find rams key).(get_number read_addr) in
-      if write_enable |> eval_arg ~get_f:get_old |> get_bool then
-        (Hashtbl.find rams key).(get_number ~get_f:get_old write_addr) <-
-          data |> eval_arg ~get_f:get_old |> get_array;
+      if write_enable |> eval_arg ~get_f:get |> get_bool then
+          writes := (key, write_addr, data) :: !writes;
+        (* (Hashtbl.find rams key).(get_number write_addr) <- *)
+        (*   data |> eval_arg ~get_f:get_old |> get_array; *)
       VBitArray result
     | Rom (_, _, read_addr) ->
       let result = (Hashtbl.find roms key).(get_number read_addr) in
@@ -152,8 +153,8 @@ let simulator program number_steps =
       VBitArray (Array.init size (fun i -> inp.(s+i)))
     | Select (i, arg) ->
       VBit ((eval_arg arg |> get_array).(i)) in
-  let exec_instr (ident, expr) =
-    set ident (eval_expr ident expr) in
+  let exec_instr writes (ident, expr) =
+    set ident (eval_expr writes ident expr) in
   let print_outout ident =
     Printf.printf "=> %s = " ident;
     match get ident with
@@ -204,9 +205,14 @@ let simulator program number_steps =
       Printf.printf "Expected input of size %d, got %d\n" expected actual;
       read_input key in
   for _ = 1 to number_steps do
+    let writes = ref [] in
     List.iter read_input program.inputs;
-    List.iter exec_instr program.eqs;
+    List.iter (exec_instr writes) program.eqs;
     List.iter print_outout program.outputs;
+    List.iter begin
+      fun (key, wa, data) ->
+        (Hashtbl.find rams key).(get_number wa) <- data |> eval_arg ~get_f:get |> get_array
+    end !writes;
     Hashtbl.iter (fun key value -> Hashtbl.replace registers key value) env
   done
 
